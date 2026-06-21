@@ -40,7 +40,7 @@ public class FilmController {
         }
         Film oldFilm = films.get(newFilm.getId());
         if (oldFilm == null) {
-            throw new ValidationException("Фильм с таким ID: " + newFilm.getId() + " не найден!");
+            throw new NotFoundException("Фильм с таким ID: " + newFilm.getId() + " не найден!");
         }
         if (newFilm.getName() != null) {
             oldFilm.setName(newFilm.getName());
