@@ -49,15 +49,21 @@ public class FilmController {
             oldFilm.setDescription(newFilm.getDescription());
         }
         if (newFilm.getReleaseDate() != null) {
+            if (newFilm.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+                throw new ValidationException("Дата релиза не может быть ранее 1895 года");
+            }
             oldFilm.setReleaseDate(newFilm.getReleaseDate());
         }
         if (newFilm.getDuration() != 0) {
+            if (newFilm.getDuration() <= 0) {
+                throw new ValidationException("Продолжительность фильма должна быть положительным  числом!");
+            }
             oldFilm.setDuration(newFilm.getDuration());
         }
         if (newFilm.getRate() != null) {
             oldFilm.setRate(newFilm.getRate());
         }
-        validate(oldFilm);
+
         log.info("Отредактирован фильм: {} (ID={})", oldFilm.getName(), oldFilm.getId());
         return oldFilm;
     }
