@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryUserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     private final InMemoryFilmStorage filmStorage;
+    private final InMemoryUserStorage userStorage;
 
     public void addLike(Long filmId, Long userId) {
         if (filmId == null) {
@@ -25,6 +27,7 @@ public class FilmService {
         if (userId == null) {
             throw new ValidationException("Должен быть указан id пользователя!");
         }
+        userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
         Film film = filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
         film.getLikes().add(userId);
         log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
@@ -37,6 +40,7 @@ public class FilmService {
         if (userId == null) {
             throw new ValidationException("Должен быть указан id пользователя!");
         }
+        userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
         Film film = filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
         if (!film.getLikes().remove(userId)) {
             throw new NotFoundException("Пользователь не ставил лайк этому фильму");
