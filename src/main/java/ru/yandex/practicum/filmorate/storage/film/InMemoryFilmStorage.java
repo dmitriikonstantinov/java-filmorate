@@ -24,7 +24,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        validate(film);
         film.setId(indexId());
         films.put(film.getId(), film);
         log.info("Создан фильм: {} (ID={})", film.getName(), film.getId());
@@ -47,15 +46,9 @@ public class InMemoryFilmStorage implements FilmStorage {
             oldFilm.setDescription(newFilm.getDescription());
         }
         if (newFilm.getReleaseDate() != null) {
-            if (newFilm.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                throw new ValidationException("Дата релиза не может быть ранее 1895 года");
-            }
             oldFilm.setReleaseDate(newFilm.getReleaseDate());
         }
         if (newFilm.getDuration() != 0) {
-            if (newFilm.getDuration() <= 0) {
-                throw new ValidationException("Продолжительность фильма должна быть положительным  числом!");
-            }
             oldFilm.setDuration(newFilm.getDuration());
         }
         if (newFilm.getRate() != null) {
@@ -66,27 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return oldFilm;
     }
 
-    private boolean validate(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            throw new ValidationException("Название должно быть указано!");
-        }
-        if (film.getDescription() == null || film.getDescription().isBlank()) {
-            throw new ValidationException("Описание не может быть пустым!");
-        }
-        if (film.getDescription().length() > 200) {
-            throw new ValidationException("Описание должно быть не более 200 символов!");
-        }
-        if (film.getReleaseDate() == null) {
-            throw new ValidationException("Дата релиза должна быть указана");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата релиза не может быть ранее 1895 года");
-        }
-        if (film.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
-        }
-        return true;
-    }
+
 
     private long indexId() {
         long maxIndexId = films.keySet().stream().mapToLong(n -> n).max().orElse(0);
