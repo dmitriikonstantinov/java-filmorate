@@ -16,10 +16,6 @@ REST API для сервиса по оценке фильмов. Учебный 
 - Глобальная обработка ошибок через @ControllerAdvice
 - Unit-тесты для контроллеров
 
-## Запуск
-```bash
-mvn clean package
-java -jar target/filmorate-*.jar
 
 ## Схема базы данных
 
@@ -54,4 +50,10 @@ LEFT JOIN film_likes fl ON f.film_id = fl.film_id
 GROUP BY f.film_id
 ORDER BY likes_count DESC
 LIMIT 10;
+
+## Запуск
+```bash
+mvn clean package
+java -jar target/filmorate-*.jar
+
 
