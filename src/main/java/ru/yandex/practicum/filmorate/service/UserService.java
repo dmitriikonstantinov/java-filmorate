@@ -31,7 +31,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Друг не найден!"));
 
         user.getFriends().add(idFriend);
-        friend.getFriends().add(idUser);
+
 
         log.info("Пользователь {} добавил друга {}", idUser, idFriend);
     }
@@ -49,7 +49,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Друг не найден!"));
 
         user.getFriends().remove(idFriend);
-        friend.getFriends().remove(idUser);
+
         log.info("Пользователь {} удалил друга {}", idUser, idFriend);
     }
 
