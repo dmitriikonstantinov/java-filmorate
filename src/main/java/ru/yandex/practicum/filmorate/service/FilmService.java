@@ -38,7 +38,7 @@ public class FilmService {
         filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
         String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
         int rowsUpdate = jdbcTemplate.update(sql, filmId, userId);
-        if (rowsUpdate == 0 ) {
+        if (rowsUpdate == 0) {
             throw new NotFoundException("Пользователь не ставил лайк фильму!");
         }
         log.info("Пользователь {} удалил лайк фильму {}", userId, filmId);
