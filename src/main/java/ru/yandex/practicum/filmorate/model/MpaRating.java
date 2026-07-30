@@ -1,5 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize(using = MpaRatingSerializer.class)
 public enum MpaRating {
     G(1, "G"),
     PG(2, "PG"),
@@ -23,18 +28,14 @@ public enum MpaRating {
         return name;
     }
 
+    @JsonCreator
+    public static MpaRating fromJson(@JsonProperty("id") int id) {
+        return fromId(id);
+    }
+
     public static MpaRating fromId(int id) {
         for (MpaRating rating : values()) {
             if (rating.id == id) {
-                return rating;
-            }
-        }
-        return null;
-    }
-
-    public static MpaRating fromName(String name) {
-        for (MpaRating rating : values()) {
-            if (rating.name.equals(name)) {
                 return rating;
             }
         }
