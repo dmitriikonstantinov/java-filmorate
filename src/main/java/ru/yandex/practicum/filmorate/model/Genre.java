@@ -12,7 +12,6 @@ public class Genre {
         this.name = name;
     }
 
-    public Genre() {}
-
-
+    public Genre() {
+    }
 }
