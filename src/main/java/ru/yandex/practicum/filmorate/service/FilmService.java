@@ -61,7 +61,7 @@ public class FilmService {
 
     public Film create(Film film) {
         if (film.getMpaRating() == null) {
-            throw new ValidationException("Рейтинг должен быть указан");
+            throw new NotFoundException("Рейтинг должен быть указан");
         }
 
 
