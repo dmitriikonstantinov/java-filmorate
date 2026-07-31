@@ -27,7 +27,7 @@ public class FilmDbStorageTest {
         Film film = new Film();
         film.setName("Thing");
         film.setDuration(120);
-        film.setRating(MpaRating.NC_17);
+        film.setMpaRating(MpaRating.NC_17);
         film.setReleaseDate(LocalDate.of(1998, 4, 25));
 
         Film savedFilm = filmStorage.create(film);
@@ -40,7 +40,7 @@ public class FilmDbStorageTest {
         Film film = new Film();
         film.setName("Thing");
         film.setDuration(120);
-        film.setRating(MpaRating.NC_17);
+        film.setMpaRating(MpaRating.NC_17);
         film.setReleaseDate(LocalDate.of(1998, 4, 25));
 
         Film savedFilm = filmStorage.create(film);
@@ -61,14 +61,14 @@ public class FilmDbStorageTest {
         Film film = new Film();
         film.setName("Thing");
         film.setDuration(120);
-        film.setRating(MpaRating.NC_17);
+        film.setMpaRating(MpaRating.NC_17);
         film.setReleaseDate(LocalDate.of(1998, 4, 25));
         filmStorage.create(film);
 
         Film film2 = new Film();
         film2.setName("Alone in the dark");
         film2.setDuration(123);
-        film2.setRating(MpaRating.NC_17);
+        film2.setMpaRating(MpaRating.NC_17);
         film2.setReleaseDate(LocalDate.of(2003, 7, 22));
         filmStorage.create(film2);
 
@@ -85,7 +85,7 @@ public class FilmDbStorageTest {
         Film film = new Film();
         film.setName("Thing");
         film.setDuration(120);
-        film.setRating(MpaRating.NC_17);
+        film.setMpaRating(MpaRating.NC_17);
         film.setReleaseDate(LocalDate.of(1998, 4, 25));
 
         Film savedFilm = filmStorage.create(film);
