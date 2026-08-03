@@ -52,10 +52,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Друг не найден!"));
 
         String sql = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
-        int rowUpdated = jdbcTemplate.update(sql, idUser, idFriend);
-        if (rowUpdated == 0) {
-            throw new NotFoundException("Такого друга нет!");
-        }
+        jdbcTemplate.update(sql, idUser, idFriend);
         log.info("Пользователь {} удалил друга {}", idUser, idFriend);
     }
 
