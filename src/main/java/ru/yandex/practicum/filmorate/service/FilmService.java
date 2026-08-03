@@ -96,9 +96,6 @@ public class FilmService {
         return filmStorage.update(newFilm);
     }
 
-    public List<Film> getFilmsByMpaRatingId(int mpaRatingId) {
-        return filmStorage.findByMpaRatingId(mpaRatingId);
-    }
 
     public Film findById(Long id) {
         return filmStorage.findById(id)

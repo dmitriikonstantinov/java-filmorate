@@ -99,9 +99,4 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    @Override
-    public List<Film> findByMpaRatingId(int mpaRatingId) {
-        String sql = "SELECT * FROM films WHERE mpa_rating_id = ?";
-        return jdbcTemplate.query(sql, mapper, mpaRatingId);
-    }
 }

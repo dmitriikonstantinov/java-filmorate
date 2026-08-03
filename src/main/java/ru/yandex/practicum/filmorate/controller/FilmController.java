@@ -58,8 +58,5 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-    @GetMapping("/by-rating/{mpaRatingId}")
-    public List<Film> getFilmsByMpaRating(@PathVariable int mpaRatingId) {
-        return filmService.getFilmsByMpaRatingId(mpaRatingId);
-    }
+
 }

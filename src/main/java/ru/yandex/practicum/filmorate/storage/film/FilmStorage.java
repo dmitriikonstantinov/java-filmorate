@@ -15,5 +15,4 @@ public interface FilmStorage {
 
     Optional<Film> findById(Long id);
 
-    List<Film> findByMpaRatingId(int mpaRatingId);
 }
