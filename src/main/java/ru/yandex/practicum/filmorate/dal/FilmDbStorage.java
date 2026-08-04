@@ -32,7 +32,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findAll() {
         String sql = """
-                SELECT 
+                SELECT
                     f.id,
                     f.name,
                     f.description,
@@ -176,7 +176,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getPopular(int count) {
         String sql = """
-                SELECT 
+                SELECT
                     f.id,
                     f.name,
                     f.description,
