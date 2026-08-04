@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.film.UserStorage;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,7 +27,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Collection<User> findAll() {
         String sql = "SELECT * FROM users";
-        return jdbcTemplate.query(sql,mapper);
+        return jdbcTemplate.query(sql, mapper);
     }
 
     @Override
@@ -66,10 +67,44 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> findById(Long id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         try {
-            User user = jdbcTemplate.queryForObject(sql,  mapper, id);
+            User user = jdbcTemplate.queryForObject(sql, mapper, id);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void addFriend(Long idUser, Long idFriend) {
+        String sql = "INSERT INTO friendship (user_id, friend_id) VALUES (? ,?)";
+        jdbcTemplate.update(sql, idUser, idFriend);
+
+    }
+
+    @Override
+    public void removeFriend(Long idUser, Long idFriend) {
+        String sql = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
+        jdbcTemplate.update(sql, idUser, idFriend);
+    }
+
+    @Override
+    public List<User> userFriends(Long userId) {
+        String sql = """
+                SELECT u.*
+                FROM users AS u
+                JOIN friendship AS fh ON u.id=fh.friend_id
+                WHERE user_id = ?
+                """;
+        return jdbcTemplate.query(sql, mapper, userId);
+    }
+
+    @Override
+    public List<User> getCommonFriend(Long userId, Long friendId) {
+        String sql = """
+                SELECT u.*
+                FROM users AS u
+                JOIN friendship AS fh1 ON u.id=fh1.friend_id AND fh1.user_id = ?
+                JOIN friendship AS fh2 ON u.id=fh2.friend_id AND fh2.user_id = ?""";
+        return jdbcTemplate.query(sql, mapper, userId, friendId);
     }
 }

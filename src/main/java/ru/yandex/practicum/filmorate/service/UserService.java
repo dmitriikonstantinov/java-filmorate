@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -18,8 +16,7 @@ import java.util.*;
 @Service
 public class UserService {
     private final UserStorage userStorage;
-    private final JdbcTemplate jdbcTemplate;
-    private final UserRowMapper userRowMapper;
+
 
     public void addFriend(Long idUser, Long idFriend) {
         if (idUser == null) {
@@ -33,9 +30,7 @@ public class UserService {
         userStorage.findById(idFriend)
                 .orElseThrow(() -> new NotFoundException("Друг не найден!"));
 
-        String sql = "INSERT INTO friendship (user_id, friend_id) VALUES (? ,?)";
-        jdbcTemplate.update(sql, idUser, idFriend);
-
+        userStorage.addFriend(idUser, idFriend);
         log.info("Пользователь {} добавил друга {}", idUser, idFriend);
     }
 
@@ -51,8 +46,7 @@ public class UserService {
         userStorage.findById(idFriend)
                 .orElseThrow(() -> new NotFoundException("Друг не найден!"));
 
-        String sql = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(sql, idUser, idFriend);
+        userStorage.removeFriend(idUser, idFriend);
         log.info("Пользователь {} удалил друга {}", idUser, idFriend);
     }
 
@@ -61,13 +55,7 @@ public class UserService {
             throw new ValidationException("Укажите id пользователя");
         }
         userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
-        String sql = """
-                SELECT u.*
-                FROM users AS u
-                JOIN friendship AS fh ON u.id=fh.friend_id
-                WHERE user_id = ?
-                """;
-        return jdbcTemplate.query(sql, userRowMapper, userId);
+        return userStorage.userFriends(userId);
     }
 
     public List<User> getCommonFriend(Long userId, Long friendId) {
@@ -76,12 +64,7 @@ public class UserService {
         }
         userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
         userStorage.findById(friendId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
-        String sql = """
-                SELECT u.*
-                FROM users AS u
-                JOIN friendship AS fh1 ON u.id=fh1.friend_id AND fh1.user_id = ?
-                JOIN friendship AS fh2 ON u.id=fh2.friend_id AND fh2.user_id = ?""";
-        return jdbcTemplate.query(sql, userRowMapper, userId, friendId);
+       return userStorage.getCommonFriend(userId, friendId);
     }
 
     public Collection<User> findAll() {
