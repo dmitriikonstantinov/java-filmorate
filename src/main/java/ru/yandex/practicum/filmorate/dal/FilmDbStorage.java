@@ -176,26 +176,26 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getPopular(int count) {
         String sql = """
-        SELECT 
-            f.id,
-            f.name,
-            f.description,
-            f.release_date,
-            f.duration,
-            f.mpa_rating_id,
-            m.name AS mpa_name,
-            g.id AS genre_id,
-            g.name AS genre_name,
-            COUNT(fl.user_id) AS likes_count
-        FROM films f
-        LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.id
-        LEFT JOIN film_likes fl ON f.id = fl.film_id
-        LEFT JOIN film_genre fg ON f.id = fg.film_id
-        LEFT JOIN genres g ON fg.genre_id = g.id
-        GROUP BY f.id, m.name, g.id, g.name
-        ORDER BY likes_count DESC
-        LIMIT ?
-        """;
+                SELECT 
+                    f.id,
+                    f.name,
+                    f.description,
+                    f.release_date,
+                    f.duration,
+                    f.mpa_rating_id,
+                    m.name AS mpa_name,
+                    g.id AS genre_id,
+                    g.name AS genre_name,
+                    COUNT(fl.user_id) AS likes_count
+                FROM films f
+                LEFT JOIN mpa_ratings m ON f.mpa_rating_id = m.id
+                LEFT JOIN film_likes fl ON f.id = fl.film_id
+                LEFT JOIN film_genre fg ON f.id = fg.film_id
+                LEFT JOIN genres g ON fg.genre_id = g.id
+                GROUP BY f.id, m.name, g.id, g.name
+                ORDER BY likes_count DESC
+                LIMIT ?
+                """;
 
         Map<Long, Film> filmMap = new LinkedHashMap<>();
 
