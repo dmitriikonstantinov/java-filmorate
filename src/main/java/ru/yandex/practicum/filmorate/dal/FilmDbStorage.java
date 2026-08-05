@@ -58,12 +58,16 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                String genreSql = "SELECT COUNT(*) FROM genres WHERE id = ?";
-                Integer genreCount = jdbcTemplate.queryForObject(genreSql, Integer.class, genre.getId());
-                if (genreCount == 0) {
-                    throw new NotFoundException("Жанр с ID " + genre.getId() + " не найден");
-                }
+            List<Integer> genreIds = film.getGenres().stream()
+                    .map(Genre::getId)
+                    .toList();
+
+            String placeholders = String.join(",", Collections.nCopies(genreIds.size(), "?"));
+            String genreSql = "SELECT COUNT(*) FROM genres WHERE id IN (" + placeholders + ")";
+            Integer count = jdbcTemplate.queryForObject(genreSql, Integer.class, genreIds.toArray());
+
+            if (count != genreIds.size()) {
+                throw new NotFoundException("Один или несколько жанров не найдены");
             }
         }
 
@@ -83,10 +87,12 @@ public class FilmDbStorage implements FilmStorage {
 
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String genreSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
+            List<Object[]> batchArgs = new ArrayList<>();
             for (Genre genre : film.getGenres()) {
-                jdbcTemplate.update(genreSql, id, genre.getId());
+                batchArgs.add(new Object[]{id, genre.getId()});
             }
-        }
+                jdbcTemplate.batchUpdate(genreSql, batchArgs);
+            }
 
         return film;
     }
@@ -104,6 +110,17 @@ public class FilmDbStorage implements FilmStorage {
                 film.getId());
         if (rowsUpdated == 0) {
             throw new NotFoundException("Фильм с ID: " + film.getId() + "  не найден!");
+        }
+
+        String deleteSql = "DELETE FROM film_genre WHERE film_id = ?";
+        jdbcTemplate.update(deleteSql, film.getId());
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            String insertSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
+            List<Object[]> batchArgs = new ArrayList<>();
+            for (Genre genre : film.getGenres()) {
+                batchArgs.add(new Object[]{film.getId(), genre.getId()});
+            }
+            jdbcTemplate.batchUpdate(insertSql, batchArgs);
         }
         return film;
     }
