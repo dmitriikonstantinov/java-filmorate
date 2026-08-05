@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.UserStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -27,7 +26,6 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
     protected final JdbcTemplate jdbcTemplate;
     protected final FilmRowMapper mapper;
-    protected final UserStorage userStorage;
 
     @Override
     public Collection<Film> findAll() {
@@ -48,35 +46,7 @@ public class FilmDbStorage implements FilmStorage {
                 ORDER BY f.id
                 """;
 
-        Map<Long, Film> filmMap = new LinkedHashMap<>();
-
-        jdbcTemplate.query(sql, (rs) -> {
-            Long filmId = rs.getLong("id");
-            Film film = filmMap.get(filmId);
-            if (film == null) {
-                film = new Film();
-                film.setId(filmId);
-                film.setName(rs.getString("name"));
-                film.setDescription(rs.getString("description"));
-                film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-                film.setDuration(rs.getInt("duration"));
-
-                int mpaId = rs.getInt("mpa_rating_id");
-                if (!rs.wasNull()) {
-                    film.setMpaRating(MpaRating.fromId(mpaId));
-                }
-
-                filmMap.put(filmId, film);
-            }
-
-            Long genreId = rs.getLong("genre_id");
-            if (!rs.wasNull() && genreId != 0) {
-                String genreName = rs.getString("genre_name");
-                film.getGenres().add(new Genre(genreId.intValue(), genreName));
-            }
-        });
-
-        return filmMap.values();
+        return filmMap(sql);
     }
 
     @Override
@@ -154,7 +124,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addLike(Long filmId, Long userId) {
-        userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
         findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
         String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
@@ -163,7 +132,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeLike(Long filmId, Long userId) {
-        userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
         findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
         String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
         int rowsUpdate = jdbcTemplate.update(sql, filmId, userId);
@@ -197,6 +165,10 @@ public class FilmDbStorage implements FilmStorage {
                 LIMIT ?
                 """;
 
+        return filmMap(sql, count);
+    }
+
+    private List<Film> filmMap(String sql, Object... params) {
         Map<Long, Film> filmMap = new LinkedHashMap<>();
 
         jdbcTemplate.query(sql, (rs) -> {
@@ -223,9 +195,10 @@ public class FilmDbStorage implements FilmStorage {
                 String genreName = rs.getString("genre_name");
                 film.getGenres().add(new Genre(genreId.intValue(), genreName));
             }
-        }, count);
+        }, params);
 
         return new ArrayList<>(filmMap.values());
+
     }
 
 }
