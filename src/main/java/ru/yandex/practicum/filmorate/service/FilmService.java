@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.film.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,27 +20,20 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
+
     public void addLike(Long filmId, Long userId) {
         userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
-        Film film = filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
-        film.getLikes().add(userId);
-        log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
+        filmStorage.addLike(filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         userStorage.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден!"));
-        Film film = filmStorage.findById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден!"));
-        if (!film.getLikes().remove(userId)) {
-            throw new NotFoundException("Пользователь не ставил лайк этому фильму");
-        }
-        log.info("Пользователь {} удалил лайк фильму {}", userId, filmId);
+        filmStorage.removeLike(filmId, userId);
     }
 
     public List<Film> getPopular(int count) {
-        return filmStorage.findAll().stream()
-                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
-                .limit(count)
-                .collect(Collectors.toList());
+
+        return filmStorage.getPopular(count);
     }
 
     public Collection<Film> findAll() {
@@ -49,6 +41,9 @@ public class FilmService {
     }
 
     public Film create(Film film) {
+        if (film.getMpaRating() == null) {
+            throw new NotFoundException("Рейтинг должен быть указан");
+        }
         validate(film);
         return filmStorage.create(film);
     }
@@ -63,6 +58,7 @@ public class FilmService {
         }
         return filmStorage.update(newFilm);
     }
+
 
     public Film findById(Long id) {
         return filmStorage.findById(id)
